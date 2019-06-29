@@ -1,5 +1,6 @@
 package com.tec.ftpserver.server;
 
+import com.tec.ftpserver.domain.MongoUser;
 import org.apache.ftpserver.ConnectionConfigFactory;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
@@ -7,7 +8,6 @@ import org.apache.ftpserver.ftplet.Authority;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.apache.ftpserver.ftplet.UserManager;
 import org.apache.ftpserver.listener.ListenerFactory;
-import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.ConcurrentLoginPermission;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class Server {
     UserManager userManager;
 
     @Autowired
-    public Server(CustomUserManager userManager) {
+    public Server(MongoUserManager userManager) {
         this.userManager = userManager;
         run();
     }
@@ -43,22 +43,26 @@ public class Server {
         serverFactory.setUserManager(userManager);
         serverFactory.setConnectionConfig(configFactory.createConnectionConfig());
 
-        BaseUser baseUser = new BaseUser();
-        baseUser.setName("Bruno");
-        baseUser.setPassword("123");
-
-        baseUser.setHomeDirectory(System.getProperty("user.home"));
         List<Authority> authorities = new ArrayList<>();
         authorities.add(new WritePermission());
-        authorities.add(new ConcurrentLoginPermission(1,1));
-        baseUser.setAuthorities(authorities);
+        authorities.add(new ConcurrentLoginPermission(1, 1));
 
+        try {
+            MongoUser user = new MongoUser("Bruno", "123", authorities);
+            userManager.save(user);
+        } catch (FtpException e) {
+            System.out.println(e.getMessage());
+        }
 
-//        try {
-//            userManager.save(baseUser);
-//        } catch (FtpException e) {
-//            e.printStackTrace();
-//        }
+//        BaseUser baseUser = new BaseUser();
+//        baseUser.setName("Bruno");
+//        baseUser.setPassword("123");
+//
+//        baseUser.setHomeDirectory(System.getProperty("user.home"));
+//        List<Authority> authorities = new ArrayList<>();
+//        authorities.add(new WritePermission());
+//        authorities.add(new ConcurrentLoginPermission(1,1));
+//        baseUser.setAuthorities(authorities);
 
         FtpServer server = serverFactory.createServer();
         try {
@@ -66,8 +70,5 @@ public class Server {
         } catch (FtpException e) {
             e.printStackTrace();
         }
-
-        System.out.println(server.isStopped());
     }
-
 }
