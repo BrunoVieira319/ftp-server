@@ -1,5 +1,6 @@
 package com.tec.ftpserver.server;
 
+import com.mongodb.DuplicateKeyException;
 import com.tec.ftpserver.domain.MongoUser;
 import com.tec.ftpserver.repository.UserRepository;
 import org.apache.ftpserver.ftplet.*;
@@ -25,15 +26,13 @@ public class MongoUserManager extends AbstractUserManager {
     @Override
     public User getUserByName(String username) throws FtpException {
         Optional<User> user = userRepository.findByName(username);
-        if (user.isPresent()) return user.get();
-        return null;
+        return user.orElse(null);
     }
 
     @Override
     public String[] getAllUserNames() throws FtpException {
         List<User> allUserNames = userRepository.findAllUserNames();
-        String[] names = (String[]) allUserNames.stream().map(User::getName).toArray();
-        return names;
+        return (String[]) allUserNames.stream().map(User::getName).toArray();
     }
 
     @Override
@@ -45,14 +44,17 @@ public class MongoUserManager extends AbstractUserManager {
     public void save(User user) throws FtpException {
         MongoUser baseUser = (MongoUser) user;
         baseUser.encryptPassword();
-        userRepository.save(baseUser);
+        try {
+            userRepository.save(baseUser);
+        } catch (DuplicateKeyException e) {
+            throw new FtpException(e.getMessage());
+        }
     }
 
     @Override
     public boolean doesExist(String username) throws FtpException {
         Optional<User> user = userRepository.findByName(username);
-        if (user.isPresent()) return true;
-        return false;
+        return user.isPresent();
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Document
+@Document(collection = "user")
 public class MongoUser implements User {
 
     @Id
@@ -73,7 +73,7 @@ public class MongoUser implements User {
 
     @Override
     public List<? extends Authority> getAuthorities() {
-        return this.authorities;
+        return Collections.unmodifiableList(this.authorities);
     }
 
     @Override

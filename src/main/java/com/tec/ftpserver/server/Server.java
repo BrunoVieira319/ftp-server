@@ -43,27 +43,6 @@ public class Server {
         serverFactory.setUserManager(userManager);
         serverFactory.setConnectionConfig(configFactory.createConnectionConfig());
 
-        List<Authority> authorities = new ArrayList<>();
-        authorities.add(new WritePermission());
-        authorities.add(new ConcurrentLoginPermission(1, 1));
-
-        try {
-            MongoUser user = new MongoUser("Bruno", "123", authorities);
-            userManager.save(user);
-        } catch (FtpException e) {
-            System.out.println(e.getMessage());
-        }
-
-//        BaseUser baseUser = new BaseUser();
-//        baseUser.setName("Bruno");
-//        baseUser.setPassword("123");
-//
-//        baseUser.setHomeDirectory(System.getProperty("user.home"));
-//        List<Authority> authorities = new ArrayList<>();
-//        authorities.add(new WritePermission());
-//        authorities.add(new ConcurrentLoginPermission(1,1));
-//        baseUser.setAuthorities(authorities);
-
         FtpServer server = serverFactory.createServer();
         try {
             server.start();
