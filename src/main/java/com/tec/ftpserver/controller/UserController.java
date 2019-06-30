@@ -39,10 +39,10 @@ public class UserController {
         MongoUser user = new MongoUser(userDto.getName(), userDto.getPassword(), authorities);
         try {
             service.save(user);
-            return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (FtpException e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Invalid user", HttpStatus.CONFLICT);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

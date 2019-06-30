@@ -1,6 +1,5 @@
 package com.tec.ftpserver.server;
 
-import com.mongodb.DuplicateKeyException;
 import com.tec.ftpserver.domain.MongoUser;
 import com.tec.ftpserver.repository.UserRepository;
 import org.apache.ftpserver.ftplet.*;
@@ -8,6 +7,7 @@ import org.apache.ftpserver.usermanager.AnonymousAuthentication;
 import org.apache.ftpserver.usermanager.UsernamePasswordAuthentication;
 import org.apache.ftpserver.usermanager.impl.AbstractUserManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -64,7 +64,6 @@ public class MongoUserManager extends AbstractUserManager {
                 UsernamePasswordAuthentication upauth = (UsernamePasswordAuthentication) authentication;
 
                 String user = upauth.getUsername();
-
                 if (user != null) {
                     String password = upauth.getPassword();
                     if (password == null) password = "";
