@@ -31,8 +31,11 @@ public class MongoUserManager extends AbstractUserManager {
 
     @Override
     public String[] getAllUserNames() throws FtpException {
-        List<User> allUserNames = userRepository.findAllUserNames();
-        return (String[]) allUserNames.stream().map(User::getName).toArray();
+        List<User> names = userRepository.findAllUserNames();
+        Object[] objects = names.stream()
+                .map(User::getName)
+                .toArray();
+        return (String[]) objects;
     }
 
     @Override

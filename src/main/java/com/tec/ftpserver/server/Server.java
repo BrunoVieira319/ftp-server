@@ -1,28 +1,24 @@
 package com.tec.ftpserver.server;
 
-import com.tec.ftpserver.domain.MongoUser;
+import lombok.Getter;
 import org.apache.ftpserver.ConnectionConfigFactory;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
-import org.apache.ftpserver.ftplet.Authority;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.apache.ftpserver.ftplet.UserManager;
 import org.apache.ftpserver.listener.ListenerFactory;
-import org.apache.ftpserver.usermanager.impl.ConcurrentLoginPermission;
-import org.apache.ftpserver.usermanager.impl.WritePermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
+@Getter
 public class Server {
 
-    FtpServerFactory serverFactory;
-    ListenerFactory listenerFactory;
-    ConnectionConfigFactory configFactory;
-    UserManager userManager;
+    private FtpServerFactory serverFactory;
+    private ListenerFactory listenerFactory;
+    private ConnectionConfigFactory configFactory;
+    private UserManager userManager;
+    private FtpServer ftpServer;
 
     @Autowired
     public Server(MongoUserManager userManager) {
@@ -43,9 +39,9 @@ public class Server {
         serverFactory.setUserManager(userManager);
         serverFactory.setConnectionConfig(configFactory.createConnectionConfig());
 
-        FtpServer server = serverFactory.createServer();
+        ftpServer = serverFactory.createServer();
         try {
-            server.start();
+            ftpServer.start();
         } catch (FtpException e) {
             e.printStackTrace();
         }

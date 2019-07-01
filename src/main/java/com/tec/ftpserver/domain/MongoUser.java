@@ -52,13 +52,12 @@ public class MongoUser implements User {
         return path.toString();
     }
 
-    public String getId() {
-        return id;
-    }
-
-
     public void encryptPassword() {
         this.password = EncryptUtils.encryptMD5(this.password);
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -87,15 +86,14 @@ public class MongoUser implements User {
 
     @Override
     public AuthorizationRequest authorize(AuthorizationRequest request) {
-        if (authorities == null) return null;
-
-        for (Authority authority : authorities) {
-            if (authority.canAuthorize(request)) {
-                request = authority.authorize(request);
-                if (request != null) return request;
+        if (authorities != null) {
+            for (Authority authority : authorities) {
+                if (authority.canAuthorize(request)) {
+                    request = authority.authorize(request);
+                    if (request != null) return request;
+                }
             }
         }
-
         return null;
     }
 
