@@ -2,27 +2,22 @@ package com.tec.ftpserver.server;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.Assert.assertEquals;
+import org.springframework.test.context.junit4.SpringRunner;
+
 import static org.junit.Assert.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest
+@RunWith(SpringRunner.class)
 public class ServerTest {
 
-    @Mock
-    MongoUserManager userManager;
+    @Autowired
+    Server ftpServer;
 
     @Test
     public void shouldRunFtpServer() {
-        Server ftpServer = new Server(userManager);
-
-        assertEquals(userManager, ftpServer.getUserManager());
         assertTrue(!ftpServer.getFtpServer().isStopped());
-
-        ftpServer.getFtpServer().stop();
     }
 }
