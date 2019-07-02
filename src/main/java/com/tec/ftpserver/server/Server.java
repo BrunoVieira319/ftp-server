@@ -14,9 +14,6 @@ import org.springframework.stereotype.Service;
 @Getter
 public class Server {
 
-    private FtpServerFactory serverFactory;
-    private ListenerFactory listenerFactory;
-    private ConnectionConfigFactory configFactory;
     private UserManager userManager;
     private FtpServer ftpServer;
 
@@ -27,14 +24,14 @@ public class Server {
     }
 
     public void run() {
-        listenerFactory = new ListenerFactory();
+        ListenerFactory listenerFactory = new ListenerFactory();
         listenerFactory.setPort(2221);
 
-        configFactory = new ConnectionConfigFactory();
+        ConnectionConfigFactory configFactory = new ConnectionConfigFactory();
         configFactory.setMaxLogins(100);
         configFactory.setMaxThreads(10);
 
-        serverFactory = new FtpServerFactory();
+        FtpServerFactory serverFactory = new FtpServerFactory();
         serverFactory.addListener("default", listenerFactory.createListener());
         serverFactory.setUserManager(userManager);
         serverFactory.setConnectionConfig(configFactory.createConnectionConfig());
@@ -45,5 +42,13 @@ public class Server {
         } catch (FtpException e) {
             e.printStackTrace();
         }
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
+    }
+
+    public FtpServer getFtpServer() {
+        return ftpServer;
     }
 }

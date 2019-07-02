@@ -31,11 +31,11 @@ public class MongoUserManager extends AbstractUserManager {
 
     @Override
     public String[] getAllUserNames() throws FtpException {
-        List<User> names = userRepository.findAllUserNames();
-        Object[] objects = names.stream()
+        List<User> result = userRepository.findAllUserNames();
+
+        return result.stream()
                 .map(User::getName)
-                .toArray();
-        return (String[]) objects;
+                .toArray(String[]::new);
     }
 
     @Override
@@ -62,32 +62,34 @@ public class MongoUserManager extends AbstractUserManager {
 
     @Override
     public User authenticate(Authentication authentication) throws AuthenticationFailedException {
-        try {
-            if (authentication instanceof UsernamePasswordAuthentication) {
-                UsernamePasswordAuthentication upauth = (UsernamePasswordAuthentication) authentication;
+        if (authentication instanceof UsernamePasswordAuthentication) {
+            UsernamePasswordAuthentication upauth = (UsernamePasswordAuthentication) authentication;
 
-                String user = upauth.getUsername();
-                if (user != null) {
-                    String password = upauth.getPassword();
-                    if (password == null) password = "";
+            String user = upauth.getUsername();
+            if (user != null) {
+                String password = upauth.getPassword();
+                if (password == null) password = "";
 
+                try {
                     String storedPassword = getUserByName(user).getPassword();
                     if (storedPassword != null && getPasswordEncryptor().matches(password, storedPassword)) {
                         return getUserByName(user);
                     }
+                } catch (FtpException e) {
+                    e.getMessage();
                 }
-                throw new AuthenticationFailedException("Authentication failed");
-
-            } else if (authentication instanceof AnonymousAuthentication) {
-                if (doesExist("anonymous")) return getUserByName("anonymous");
-                throw new AuthenticationFailedException("Authentication failed");
-            } else {
-                throw new IllegalArgumentException(
-                        "Authentication not supported by this user manager");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            throw new AuthenticationFailedException("Authentication failed");
+
+        } else if (authentication instanceof AnonymousAuthentication) {
+            try {
+                if (doesExist("anonymous")) return getUserByName("anonymous");
+            } catch (FtpException e) {
+                e.printStackTrace();
+            }
+            throw new AuthenticationFailedException("Authentication failed");
         }
-        return null;
+        throw new IllegalArgumentException(
+                "Authentication not supported by this user manager");
     }
 }
