@@ -31,7 +31,7 @@ public class UserControllerTest {
     MongoUserManager userManager;
 
     @Test
-    public void shouldReturnStatusOkWhenPostUser() throws Exception {
+    public void shouldReturnStatusOkWhenUserIsPosted() throws Exception {
         doNothing().when(userManager).save(any(MongoUser.class));
 
         UserDto user = new UserDto();
@@ -45,7 +45,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void shouldReturnStatusConflictWhenPostUser() throws Exception {
+    public void shouldReturnStatusConflictWhenUserIsPosted() throws Exception {
         doThrow(FtpException.class).when(userManager).save(any(MongoUser.class));
 
         UserDto user = new UserDto();
